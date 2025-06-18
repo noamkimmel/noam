@@ -167,8 +167,9 @@
         }
 
         .result-card.error {
-            background: linear-gradient(135deg, #ff4757, #ff3742);
-            color: white;
+            background: linear-gradient(135deg, #2d2d2d, #3d3d3d);
+            color: #ff6b6b;
+            border: 2px solid #ff6b6b;
         }
 
         .result-title {
@@ -532,7 +533,7 @@
                     </div>
                     <div class="tip-item">
                         <span class="tip-emoji">📏</span>
-                        מרחק 15-50 ס"מ
+                        מרחק 20-80 ס"מ
                     </div>
                     <div class="tip-item">
                         <span class="tip-emoji">🎯</span>
@@ -596,7 +597,7 @@
             startScanning();
         });
 
-        // התחלת סריקה - גרסה פשוטה ויציבה
+        // התחלת סריקה - משופרת למרחק ופוקוס טובים יותר
         async function startScanning() {
             if (isScanning) return;
 
@@ -606,28 +607,43 @@
                 startBtn.style.display = 'none';
                 stopBtn.style.display = 'block';
 
-                // בקש הרשאה למצלמה בצורה פשוטה
+                // בקש הרשאה למצלמה עם רזולוציה גבוהה
                 videoStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
                         facingMode: 'environment',
-                        width: 640,
-                        height: 480
+                        width: { ideal: 1920, min: 1280 },
+                        height: { ideal: 1080, min: 720 }
                     } 
                 });
 
-                // שמור הפניה לוידאו טראק
                 videoTrack = videoStream.getVideoTracks()[0];
                 
-                // נסה להגדיר פוקוס רציף (אם זמין)
+                // הגדר פוקוס מתקדם
                 try {
                     const capabilities = videoTrack.getCapabilities();
-                    if (capabilities.focusMode && capabilities.focusMode.includes('continuous')) {
-                        await videoTrack.applyConstraints({
-                            advanced: [{ focusMode: 'continuous' }]
-                        });
-                    }
+                    const settings = videoTrack.getSettings();
+                    console.log('יכולות מצלמה:', capabilities);
+                    console.log('הגדרות נוכחיות:', settings);
+                    
+                    // נסה להגדיר פוקוס מתקדם
+                    await videoTrack.applyConstraints({
+                        focusMode: 'continuous',
+                        focusDistance: 0.6, // מרחק של 60 ס"מ
+                        zoom: 1.0
+                    });
+                    
                 } catch (e) {
-                    console.log('פוקוס אוטומטי לא זמין');
+                    console.log('הגדרות מתקדמות לא זמינות, משתמש בבסיסי');
+                    try {
+                        await videoTrack.applyConstraints({
+                            advanced: [
+                                { focusMode: 'continuous' },
+                                { focusDistance: { ideal: 0.6, min: 0.2, max: 2.0 } }
+                            ]
+                        });
+                    } catch (e2) {
+                        console.log('רק פוקוס בסיסי זמין');
+                    }
                 }
 
                 await Quagga.init({
@@ -636,25 +652,34 @@
                         type: "LiveStream",
                         target: document.querySelector('#scanner'),
                         constraints: {
-                            width: 640,
-                            height: 480,
+                            width: { ideal: 1920, min: 1280 },
+                            height: { ideal: 1080, min: 720 },
                             facingMode: "environment"
                         },
                     },
                     locator: {
-                        patchSize: "large",
-                        halfSample: false
+                        patchSize: "x-large",
+                        halfSample: false,
+                        showCanvas: false,
+                        showPatches: false,
+                        showFoundPatches: false,
+                        showSkeleton: false,
+                        showLabels: false,
+                        showPatchLabels: false,
+                        showRemainingPatchLabels: false
                     },
-                    numOfWorkers: 4,
-                    frequency: 10,
+                    numOfWorkers: navigator.hardwareConcurrency || 8,
+                    frequency: 30, // תדירות גבוהה מאוד
                     decoder: {
                         readers: [
                             "ean_reader",
-                            "ean_8_reader",
+                            "ean_8_reader", 
                             "code_128_reader",
                             "upc_reader",
-                            "upc_e_reader"
-                        ]
+                            "upc_e_reader",
+                            "code_39_reader" // הוספתי עוד סוג
+                        ],
+                        multiple: false
                     },
                     locate: true
                 });
@@ -665,36 +690,72 @@
                 showLoading(false);
                 updateStatus('סורק ברקודים...', true);
 
-                // האזנה לברקודים - פשוט ויעיל
-                let successCount = 0;
-                let lastCode = '';
+                // אלגוריתם זיהוי משופר לטווח רחוק
+                let validDetections = [];
+                const WINDOW_TIME = 2000; // 2 שניות
+                const MIN_DETECTIONS = 3;
+                const MIN_CONFIDENCE = 0.6;
 
                 Quagga.onDetected((result) => {
                     const code = result.codeResult.code;
+                    const now = Date.now();
                     
-                    // בדיקה בסיסית של תקינות
+                    // בדוק תקינות בסיסית
                     if (code.length < 8 || code.length > 14 || !/^\d+$/.test(code)) {
                         return;
                     }
                     
-                    if (code === lastCode) {
-                        successCount++;
-                    } else {
-                        successCount = 1;
-                        lastCode = code;
+                    // חשב ציון ביטחון
+                    let confidence = 1.0;
+                    if (result.codeResult.decodedCodes && result.codeResult.decodedCodes.length > 0) {
+                        const errors = result.codeResult.decodedCodes
+                            .filter(decoded => decoded.error !== undefined)
+                            .map(decoded => decoded.error);
+                            
+                        if (errors.length > 0) {
+                            const avgError = errors.reduce((sum, err) => sum + err, 0) / errors.length;
+                            confidence = Math.max(0, 1 - (avgError / 0.5)); // נורמליזציה
+                        }
                     }
                     
-                    if (successCount >= 2) {
+                    // קבל רק זיהויים עם ביטחון גבוה מספיק
+                    if (confidence < MIN_CONFIDENCE) {
+                        return;
+                    }
+                    
+                    // הוסף לרשימת זיהויים תקינים
+                    validDetections.push({
+                        code: code,
+                        confidence: confidence,
+                        timestamp: now
+                    });
+                    
+                    // נקה זיהויים ישנים
+                    validDetections = validDetections.filter(detection => 
+                        now - detection.timestamp < WINDOW_TIME
+                    );
+                    
+                    // ספור זיהויים של אותו קוד
+                    const sameCodeCount = validDetections.filter(d => d.code === code).length;
+                    
+                    // אשר רק אחרי מספיק זיהויים
+                    if (sameCodeCount >= MIN_DETECTIONS) {
+                        // חשב ציון ביטחון ממוצע
+                        const avgConfidence = validDetections
+                            .filter(d => d.code === code)
+                            .reduce((sum, d) => sum + d.confidence, 0) / sameCodeCount;
+                            
+                        console.log(`קוד אושר: ${code}, ביטחון: ${avgConfidence.toFixed(2)}, זיהויים: ${sameCodeCount}`);
+                        
                         vibrate();
                         onBarcodeDetected(result);
-                        successCount = 0;
-                        lastCode = '';
+                        validDetections = []; // נקה לזיהוי הבא
                     }
                 });
 
             } catch (error) {
                 console.error('שגיאה בהפעלת הסורק:', error);
-                showError('שגיאה בגישה למצלמה. אנא ודא שנתת הרשאה למצלמה ונסה שוב.');
+                showError('לא ניתן להפעיל את המצלמה. נסה לרענן את הדף או לבדוק הרשאות.');
                 resetButtons();
                 showLoading(false);
                 updateStatus('שגיאה במצלמה', false);
