@@ -80,6 +80,7 @@
             height: 100%;
             object-fit: cover;
             transform: scaleX(-1);
+            cursor: pointer;
         }
 
         .scan-overlay {
@@ -477,6 +478,16 @@
                     <div class="scan-overlay">
                         <div class="scan-line"></div>
                     </div>
+                    <!-- כפתור פוקוס -->
+                    <div style="position: absolute; top: 10px; right: 10px;">
+                        <button id="focusBtn" style="background: rgba(0,255,136,0.8); border: none; padding: 10px; border-radius: 50%; color: #000; font-size: 1.2rem; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+                            🎯
+                        </button>
+                    </div>
+                    <!-- הודעת פוקוס -->
+                    <div id="focusIndicator" style="position: absolute; top: 50px; right: 10px; background: rgba(0,255,136,0.9); color: #000; padding: 8px 12px; border-radius: 20px; font-size: 0.8rem; display: none; font-weight: bold;">
+                        מפקס...
+                    </div>
                 </div>
 
                 <!-- מסך טעינה -->
@@ -563,6 +574,8 @@
         let scanHistory = JSON.parse(localStorage.getItem('barcodeHistory') || '[]');
         let isScanning = false;
         let currentResult = null;
+        let videoStream = null;
+        let videoTrack = null;
 
         // אלמנטים
         const startBtn = document.getElementById('startBtn');
@@ -583,6 +596,9 @@
         const historyList = document.getElementById('historyList');
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
+        const focusBtn = document.getElementById('focusBtn');
+        const focusIndicator = document.getElementById('focusIndicator');
+        const scannerVideo = document.querySelector('#scanner video');
 
         // אירועים
         startBtn.addEventListener('click', startScanning);
@@ -596,7 +612,11 @@
             startScanning();
         });
 
-        // התחלת סריקה
+        // אירועי פוקוס
+        focusBtn.addEventListener('click', manualFocus);
+        document.getElementById('scanner').addEventListener('click', manualFocus);
+
+        // התחלת סריקה משופרת
         async function startScanning() {
             if (isScanning) return;
 
@@ -606,8 +626,22 @@
                 startBtn.style.display = 'none';
                 stopBtn.style.display = 'block';
 
-                // בקש הרשאה למצלמה
-                await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                // בקש הרשאה למצלמה עם הגדרות מתקדמות
+                videoStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1280, min: 640 },
+                        height: { ideal: 720, min: 480 },
+                        focusMode: 'continuous',
+                        advanced: [
+                            { focusMode: 'continuous' },
+                            { focusDistance: { max: 10 } }
+                        ]
+                    } 
+                });
+
+                // שמור הפניה לוידאו טראק לפוקוס
+                videoTrack = videoStream.getVideoTracks()[0];
 
                 await Quagga.init({
                     inputStream: {
@@ -615,17 +649,17 @@
                         type: "LiveStream",
                         target: document.querySelector('#scanner'),
                         constraints: {
-                            width: 640,
-                            height: 480,
+                            width: { ideal: 1280, min: 640 },
+                            height: { ideal: 720, min: 480 },
                             facingMode: "environment"
                         },
                     },
                     locator: {
-                        patchSize: "large",
+                        patchSize: "x-large",
                         halfSample: false
                     },
-                    numOfWorkers: 4,
-                    frequency: 10,
+                    numOfWorkers: navigator.hardwareConcurrency || 4,
+                    frequency: 15,
                     decoder: {
                         readers: [
                             "ean_reader",
@@ -644,25 +678,35 @@
                 showLoading(false);
                 updateStatus('סורק ברקודים...', true);
 
-                // האזנה לברקודים
-                let successCount = 0;
-                let lastCode = '';
+                // האזנה לברקודים עם בדיקת איכות משופרת
+                let detectionHistory = [];
+                const REQUIRED_DETECTIONS = 3;
 
                 Quagga.onDetected((result) => {
                     const code = result.codeResult.code;
+                    const format = result.codeResult.format;
                     
-                    if (code === lastCode) {
-                        successCount++;
-                    } else {
-                        successCount = 1;
-                        lastCode = code;
+                    // בדוק תקינות הקוד
+                    if (code.length < 8 || code.length > 14 || !/^\d+$/.test(code)) {
+                        return;
                     }
                     
-                    if (successCount >= 2) {
+                    // הוסף להיסטוריית זיהויים
+                    detectionHistory.push({ code, format, timestamp: Date.now() });
+                    
+                    // שמור רק זיהויים מה-10 שניות האחרונות
+                    detectionHistory = detectionHistory.filter(
+                        detection => Date.now() - detection.timestamp < 10000
+                    );
+                    
+                    // ספור זיהויים של אותו קוד
+                    const sameCodeCount = detectionHistory.filter(d => d.code === code).length;
+                    
+                    // אשר רק אחרי מספיק זיהויים
+                    if (sameCodeCount >= REQUIRED_DETECTIONS) {
                         vibrate();
                         onBarcodeDetected(result);
-                        successCount = 0;
-                        lastCode = '';
+                        detectionHistory = [];
                     }
                 });
 
@@ -680,10 +724,61 @@
             if (!isScanning) return;
 
             Quagga.stop();
+            
+            // סגור את הזרם
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+                videoTrack = null;
+            }
+            
             isScanning = false;
             cameraContainer.style.display = 'none';
             resetButtons();
             updateStatus('מוכן לסריקה', false);
+        }
+
+        // פוקוס ידני
+        async function manualFocus() {
+            if (!videoTrack || !isScanning) return;
+
+            try {
+                focusIndicator.style.display = 'block';
+                
+                // נסה להפעיל פוקוס ידני
+                const capabilities = videoTrack.getCapabilities();
+                
+                if (capabilities.focusMode && capabilities.focusMode.includes('manual')) {
+                    await videoTrack.applyConstraints({
+                        advanced: [{ focusMode: 'manual' }]
+                    });
+                    
+                    // חזור לפוקוס אוטומטי אחרי שנייה
+                    setTimeout(async () => {
+                        try {
+                            await videoTrack.applyConstraints({
+                                advanced: [{ focusMode: 'continuous' }]
+                            });
+                        } catch (e) {
+                            console.log('לא ניתן לחזור לפוקוס אוטומטי');
+                        }
+                    }, 1000);
+                } else {
+                    // אם אין תמיכה בפוקוס ידני, נסה רק לרענן
+                    await videoTrack.applyConstraints({
+                        advanced: [{ focusMode: 'continuous' }]
+                    });
+                }
+                
+                vibrate();
+                
+            } catch (error) {
+                console.log('פוקוס לא זמין:', error);
+            } finally {
+                setTimeout(() => {
+                    focusIndicator.style.display = 'none';
+                }, 1500);
+            }
         }
 
         // איפוס כפתורים
