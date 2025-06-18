@@ -2,61 +2,66 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>סורק ברקודים - קורא ברקודים</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>סורק ברקודים - מותאם לטלפון</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            overflow-x: hidden;
             min-height: 100vh;
-            padding: 20px;
+            position: relative;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            overflow: hidden;
+        .app-container {
+            max-width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
-            color: #333;
-            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
             text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 600;
         }
 
         .header p {
-            font-size: 1.1rem;
-            opacity: 0.8;
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
 
         .main-content {
-            padding: 40px;
+            flex: 1;
+            padding: 20px;
+            padding-bottom: 100px;
         }
 
-        .scanner-section {
-            background: #f8f9ff;
-            border: 3px solid #ff9a9e;
-            border-radius: 15px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 30px;
+        .scanner-card {
+            background: #2d2d2d;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .camera-container {
@@ -64,15 +69,17 @@
             background: #000;
             border-radius: 15px;
             overflow: hidden;
-            margin: 20px auto;
-            max-width: 500px;
+            margin: 20px 0;
             display: none;
+            aspect-ratio: 4/3;
+            max-height: 70vh;
         }
 
         #scanner {
             width: 100%;
-            height: 400px;
-            transform: scaleX(-1); /* תיקון כיוון המצלמה */
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
         }
 
         .scan-overlay {
@@ -80,13 +87,13 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            border: 2px solid #ff9a9e;
-            width: 250px;
+            border: 3px solid #00ff88;
+            width: 280px;
             height: 100px;
             border-radius: 10px;
             box-shadow: 
-                0 0 0 9999px rgba(0, 0, 0, 0.5),
-                inset 0 0 50px rgba(255, 154, 158, 0.3);
+                0 0 0 9999px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(0, 255, 136, 0.5);
         }
 
         .scan-line {
@@ -94,140 +101,170 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #ff9a9e, transparent);
-            animation: scanning 2s linear infinite;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            animation: scanning 2s ease-in-out infinite;
+            box-shadow: 0 0 10px #00ff88;
         }
 
         @keyframes scanning {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(98px); }
+            0%, 100% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(94px); opacity: 0.7; }
         }
 
-        .control-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
+        .control-section {
+            text-align: center;
             margin: 20px 0;
         }
 
-        .btn {
-            background: linear-gradient(135deg, #ff9a9e, #fecfef);
-            color: #333;
+        .main-btn {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000;
             border: none;
-            padding: 15px 30px;
+            padding: 18px 40px;
             border-radius: 50px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+            width: 100%;
+            max-width: 300px;
+            margin: 10px auto;
+            display: block;
+            touch-action: manipulation;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(255, 154, 158, 0.4);
+        .main-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
         }
 
-        .btn:disabled {
-            opacity: 0.6;
+        .main-btn:disabled {
+            background: #666;
+            color: #999;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
-        .btn.secondary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        .stop-btn {
+            background: linear-gradient(135deg, #ff4757, #ff3742);
             color: white;
+            margin-top: 10px;
         }
 
-        .result-section {
-            background: linear-gradient(135deg, #11998e, #38ef7d);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-top: 30px;
+        .stop-btn:active {
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000;
+            padding: 25px;
+            border-radius: 20px;
+            margin: 20px 0;
             display: none;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
         }
 
-        .result-section.error {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        .result-card.error {
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+            color: white;
         }
 
         .result-title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-weight: bold;
+            text-align: center;
         }
 
         .barcode-display {
-            background: rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.15);
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 15px;
             margin: 20px 0;
             text-align: center;
             font-family: 'Courier New', monospace;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: bold;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
+            word-break: break-all;
         }
 
         .barcode-info {
-            background: rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.1);
             padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
-            margin: 8px 0;
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            font-size: 0.95rem;
         }
 
         .info-row:last-child {
             border-bottom: none;
         }
 
-        .result-actions {
-            display: flex;
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
-            flex-wrap: wrap;
             margin-top: 20px;
         }
 
         .action-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 10px 20px;
+            background: rgba(0,0,0,0.2);
+            color: inherit;
+            border: 2px solid rgba(0,0,0,0.2);
+            padding: 12px 15px;
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            touch-action: manipulation;
         }
 
-        .action-btn:hover {
-            background: rgba(255,255,255,0.3);
+        .action-btn:active {
+            background: rgba(0,0,0,0.3);
+            transform: scale(0.95);
         }
 
-        .history-section {
-            margin-top: 30px;
+        .scan-again-btn {
+            grid-column: 1 / -1;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(0,0,0,0.3);
+            margin-top: 10px;
+        }
+
+        .history-card {
+            background: #2d2d2d;
+            border-radius: 20px;
             padding: 20px;
-            background: #f8f9ff;
-            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .history-title {
+            color: #00ff88;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: bold;
         }
 
         .history-item {
-            background: white;
+            background: #3d3d3d;
             padding: 15px;
             margin: 10px 0;
-            border-radius: 10px;
-            border-right: 4px solid #ff9a9e;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-radius: 15px;
+            border-right: 4px solid #00ff88;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -236,59 +273,42 @@
         .history-barcode {
             font-family: 'Courier New', monospace;
             font-weight: bold;
-            color: #333;
+            color: #00ff88;
+            font-size: 1.1rem;
         }
 
-        .history-time {
+        .history-meta {
             font-size: 0.8rem;
-            color: #666;
+            color: #999;
+            margin-top: 5px;
         }
 
-        .tips-section {
-            background: #e8f5e8;
-            border: 2px solid #4caf50;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 30px;
-        }
-
-        .tips-title {
-            color: #2e7d32;
+        .history-copy {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
             font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .tips-list {
-            color: #388e3c;
-            list-style-type: none;
-        }
-
-        .tips-list li {
-            margin: 5px 0;
-            padding-right: 20px;
-            position: relative;
-        }
-
-        .tips-list li::before {
-            content: "💡";
-            position: absolute;
-            right: 0;
+            touch-action: manipulation;
         }
 
         .loading {
             text-align: center;
-            padding: 20px;
-            color: #666;
+            padding: 30px;
+            color: #999;
         }
 
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #ff9a9e;
+            border: 3px solid #333;
+            border-top: 3px solid #00ff88;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 15px;
         }
 
         @keyframes spin {
@@ -296,53 +316,159 @@
             100% { transform: rotate(360deg); }
         }
 
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                border-radius: 15px;
-            }
-            
+        .tips-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            color: white;
+        }
+
+        .tips-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .tip-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+        }
+
+        .tip-emoji {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #2d2d2d;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+            z-index: 1000;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #999;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+        }
+
+        .status-dot.active {
+            background: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .vibrate-feedback {
+            animation: vibrate 0.3s ease-in-out;
+        }
+
+        @keyframes vibrate {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        /* הסתרת scrollbar */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        /* מונע zoom על double tap */
+        input, button, select, textarea {
+            font-size: 16px;
+        }
+
+        @media (max-width: 480px) {
             .header {
-                padding: 20px;
+                padding: 15px;
             }
             
             .header h1 {
-                font-size: 2rem;
+                font-size: 1.5rem;
             }
             
             .main-content {
-                padding: 20px;
+                padding: 15px;
+                padding-bottom: 80px;
             }
             
-            .scanner-section {
-                padding: 20px;
+            .scanner-card {
+                padding: 15px;
             }
-
-            .control-buttons {
-                flex-direction: column;
-                align-items: center;
+            
+            .scan-overlay {
+                width: 250px;
+                height: 80px;
             }
+            
+            .tips-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
 
-            .btn {
-                width: 100%;
-                max-width: 300px;
+        @media (orientation: landscape) and (max-height: 500px) {
+            .camera-container {
+                max-height: 50vh;
+            }
+            
+            .header {
+                padding: 10px;
+            }
+            
+            .main-content {
+                padding: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
         <div class="header">
             <h1>📊 סורק ברקודים</h1>
-            <p>צלם או סרוק ברקודים כדי לקרוא את המספרים שלהם</p>
+            <p>סרוק ברקודים בקלות עם הטלפון שלך</p>
         </div>
 
         <div class="main-content">
-            <!-- בקרת סורק -->
-            <div class="scanner-section">
-                <div class="control-buttons">
-                    <button class="btn" id="startBtn">📱 הפעל מצלמה</button>
-                    <button class="btn secondary" id="stopBtn" disabled>⏹️ עצור סריקה</button>
+            <!-- כרטיס הסורק -->
+            <div class="scanner-card">
+                <div class="control-section">
+                    <button class="main-btn" id="startBtn">
+                        📱 התחל סריקה
+                    </button>
+                    <button class="main-btn stop-btn" id="stopBtn" style="display: none;">
+                        ⏹️ עצור סריקה
+                    </button>
                 </div>
 
                 <!-- אזור המצלמה -->
@@ -360,11 +486,10 @@
                 </div>
             </div>
 
-            <!-- תוצאות הסריקה -->
-            <div class="result-section" id="resultSection">
+            <!-- כרטיס תוצאות -->
+            <div class="result-card" id="resultCard">
                 <div class="result-title">
-                    <span>🎯</span>
-                    <span>ברקוד נמצא!</span>
+                    🎯 ברקוד נסרק בהצלחה!
                 </div>
                 
                 <div class="barcode-display" id="barcodeDisplay"></div>
@@ -384,30 +509,50 @@
                     </div>
                 </div>
 
-                <div class="result-actions">
-                    <button class="action-btn" id="copyBtn">📋 העתק מספר</button>
+                <div class="action-buttons">
+                    <button class="action-btn" id="copyBtn">📋 העתק</button>
                     <button class="action-btn" id="shareBtn">📤 שתף</button>
-                    <button class="action-btn" id="searchBtn">🔍 חפש מוצר</button>
-                    <button class="action-btn" id="scanAgainBtn">🔄 סרוק שוב</button>
+                    <button class="action-btn" id="searchBtn">🔍 חפש</button>
+                    <button class="action-btn" id="saveBtn">💾 שמור</button>
+                    <button class="action-btn scan-again-btn" id="scanAgainBtn">🔄 סרוק שוב</button>
                 </div>
             </div>
 
-            <!-- היסטוריית סריקות -->
-            <div class="history-section" id="historySection" style="display: none;">
-                <h3>🕐 ברקודים שנסרקו לאחרונה:</h3>
+            <!-- כרטיס היסטוריה -->
+            <div class="history-card" id="historyCard" style="display: none;">
+                <div class="history-title">🕐 ברקודים אחרונים</div>
                 <div id="historyList"></div>
             </div>
 
-            <!-- טיפים לשימוש -->
-            <div class="tips-section">
-                <div class="tips-title">💡 טיפים לסריקה מיטבית:</div>
-                <ul class="tips-list">
-                    <li>החזק את המכשיר יציב ונקה מהברקוד</li>
-                    <li>ודא שיש תאורה טובה</li>
-                    <li>מקם את הברקוד בתוך המסגרת הוורודה</li>
-                    <li>אם הסריקה לא עובדת, נסה מזווית אחרת</li>
-                    <li>עבור ברקודים קטנים, התקרב יותר</li>
-                </ul>
+            <!-- כרטיס טיפים -->
+            <div class="tips-card">
+                <div class="tips-title">💡 טיפים לסריקה מיטבית</div>
+                <div class="tips-grid">
+                    <div class="tip-item">
+                        <span class="tip-emoji">🔦</span>
+                        ודא תאורה טובה
+                    </div>
+                    <div class="tip-item">
+                        <span class="tip-emoji">📏</span>
+                        שמור מרחק 10-30 ס"מ
+                    </div>
+                    <div class="tip-item">
+                        <span class="tip-emoji">🎯</span>
+                        כוון למרכז המסגרת
+                    </div>
+                    <div class="tip-item">
+                        <span class="tip-emoji">✋</span>
+                        החזק יד יציבה
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- סטטוס בר -->
+        <div class="status-bar">
+            <div class="status-indicator" id="statusIndicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">מוכן לסריקה</span>
             </div>
         </div>
     </div>
@@ -417,13 +562,14 @@
         let scanner = null;
         let scanHistory = JSON.parse(localStorage.getItem('barcodeHistory') || '[]');
         let isScanning = false;
+        let currentResult = null;
 
         // אלמנטים
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
         const cameraContainer = document.getElementById('cameraContainer');
         const loading = document.getElementById('loading');
-        const resultSection = document.getElementById('resultSection');
+        const resultCard = document.getElementById('resultCard');
         const barcodeDisplay = document.getElementById('barcodeDisplay');
         const barcodeFormat = document.getElementById('barcodeFormat');
         const barcodeLength = document.getElementById('barcodeLength');
@@ -431,9 +577,12 @@
         const copyBtn = document.getElementById('copyBtn');
         const shareBtn = document.getElementById('shareBtn');
         const searchBtn = document.getElementById('searchBtn');
+        const saveBtn = document.getElementById('saveBtn');
         const scanAgainBtn = document.getElementById('scanAgainBtn');
-        const historySection = document.getElementById('historySection');
+        const historyCard = document.getElementById('historyCard');
         const historyList = document.getElementById('historyList');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
 
         // אירועים
         startBtn.addEventListener('click', startScanning);
@@ -441,18 +590,25 @@
         copyBtn.addEventListener('click', copyBarcode);
         shareBtn.addEventListener('click', shareBarcode);
         searchBtn.addEventListener('click', searchProduct);
-        scanAgainBtn.addEventListener('click', startScanning);
+        saveBtn.addEventListener('click', saveBarcode);
+        scanAgainBtn.addEventListener('click', () => {
+            resultCard.style.display = 'none';
+            startScanning();
+        });
 
         // התחלת סריקה
         async function startScanning() {
             if (isScanning) return;
 
             try {
+                updateStatus('מתחבר למצלמה...', false);
                 showLoading(true);
-                startBtn.disabled = true;
-                stopBtn.disabled = false;
+                startBtn.style.display = 'none';
+                stopBtn.style.display = 'block';
 
-                // הגדרות הסורק משופרות
+                // בקש הרשאה למצלמה
+                await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+
                 await Quagga.init({
                     inputStream: {
                         name: "Live",
@@ -461,7 +617,7 @@
                         constraints: {
                             width: 640,
                             height: 480,
-                            facingMode: "environment" // מצלמה אחורית
+                            facingMode: "environment"
                         },
                     },
                     locator: {
@@ -486,15 +642,15 @@
                 isScanning = true;
                 cameraContainer.style.display = 'block';
                 showLoading(false);
+                updateStatus('סורק ברקודים...', true);
 
-                // האזנה לברקודים עם בדיקת איכות
+                // האזנה לברקודים
                 let successCount = 0;
                 let lastCode = '';
 
                 Quagga.onDetected((result) => {
                     const code = result.codeResult.code;
                     
-                    // ודא שקיבלנו את אותו קוד כמה פעמים
                     if (code === lastCode) {
                         successCount++;
                     } else {
@@ -502,8 +658,8 @@
                         lastCode = code;
                     }
                     
-                    // קבל רק אחרי 2 קריאות זהות
                     if (successCount >= 2) {
+                        vibrate();
                         onBarcodeDetected(result);
                         successCount = 0;
                         lastCode = '';
@@ -512,9 +668,10 @@
 
             } catch (error) {
                 console.error('שגיאה בהפעלת הסורק:', error);
-                showError('שגיאה בגישה למצלמה. אנא ודא שנתת הרשאה למצלמה.');
+                showError('שגיאה בגישה למצלמה. אנא ודא שנתת הרשאה למצלמה ונסה שוב.');
                 resetButtons();
                 showLoading(false);
+                updateStatus('שגיאה במצלמה', false);
             }
         }
 
@@ -526,12 +683,13 @@
             isScanning = false;
             cameraContainer.style.display = 'none';
             resetButtons();
+            updateStatus('מוכן לסריקה', false);
         }
 
         // איפוס כפתורים
         function resetButtons() {
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
+            startBtn.style.display = 'block';
+            stopBtn.style.display = 'none';
         }
 
         // טיפול בזיהוי ברקוד
@@ -539,24 +697,22 @@
             const code = result.codeResult.code;
             const format = result.codeResult.format;
             
-            // עצור סריקה אוטומטית אחרי זיהוי
             stopScanning();
             
-            // הצג תוצאה
-            showResult({
+            currentResult = {
                 code: code,
                 format: format,
                 timestamp: new Date()
-            });
-
-            // הוסף להיסטוריה
-            addToHistory(code, format);
+            };
+            
+            showResult(currentResult);
+            updateStatus('ברקוד נסרק בהצלחה!', false);
         }
 
         // הצגת תוצאה
         function showResult(result) {
-            resultSection.style.display = 'block';
-            resultSection.className = 'result-section';
+            resultCard.style.display = 'block';
+            resultCard.className = 'result-card';
             
             barcodeDisplay.textContent = result.code;
             barcodeFormat.textContent = translateFormat(result.format);
@@ -564,7 +720,7 @@
             scanTime.textContent = result.timestamp.toLocaleString('he-IL');
 
             // גלול לתוצאה
-            resultSection.scrollIntoView({ behavior: 'smooth' });
+            resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         // תרגום פורמטים
@@ -584,22 +740,25 @@
 
         // העתק ברקוד
         function copyBarcode() {
-            const barcode = barcodeDisplay.textContent;
-            navigator.clipboard.writeText(barcode).then(() => {
+            if (!currentResult) return;
+            
+            navigator.clipboard.writeText(currentResult.code).then(() => {
                 copyBtn.textContent = '✅ הועתק!';
+                vibrate();
                 setTimeout(() => {
-                    copyBtn.textContent = '📋 העתק מספר';
+                    copyBtn.textContent = '📋 העתק';
                 }, 2000);
             });
         }
 
         // שתף ברקוד
         function shareBarcode() {
-            const barcode = barcodeDisplay.textContent;
+            if (!currentResult) return;
+            
             if (navigator.share) {
                 navigator.share({
                     title: 'ברקוד שנסרק',
-                    text: `ברקוד: ${barcode}`
+                    text: `ברקוד: ${currentResult.code}\nסוג: ${translateFormat(currentResult.format)}`
                 });
             } else {
                 copyBarcode();
@@ -608,9 +767,22 @@
 
         // חפש מוצר
         function searchProduct() {
-            const barcode = barcodeDisplay.textContent;
-            const searchUrl = `https://www.google.com/search?q=barcode+${barcode}`;
+            if (!currentResult) return;
+            
+            const searchUrl = `https://www.google.com/search?q=barcode+${currentResult.code}`;
             window.open(searchUrl, '_blank');
+        }
+
+        // שמור ברקוד
+        function saveBarcode() {
+            if (!currentResult) return;
+            
+            addToHistory(currentResult.code, currentResult.format);
+            saveBtn.textContent = '✅ נשמר!';
+            vibrate();
+            setTimeout(() => {
+                saveBtn.textContent = '💾 שמור';
+            }, 2000);
         }
 
         // הוסף להיסטוריה
@@ -621,11 +793,9 @@
                 timestamp: new Date().toLocaleString('he-IL')
             };
 
-            // הסר כפילויות
             scanHistory = scanHistory.filter(item => item.code !== code);
             scanHistory.unshift(historyItem);
 
-            // שמור רק 10 האחרונים
             if (scanHistory.length > 10) {
                 scanHistory = scanHistory.slice(0, 10);
             }
@@ -637,14 +807,14 @@
         // עדכן תצוגת היסטוריה
         function updateHistoryDisplay() {
             if (scanHistory.length > 0) {
-                historySection.style.display = 'block';
+                historyCard.style.display = 'block';
                 historyList.innerHTML = scanHistory.map(item => `
                     <div class="history-item">
                         <div>
                             <div class="history-barcode">${item.code}</div>
-                            <div class="history-time">${item.timestamp} | ${translateFormat(item.format)}</div>
+                            <div class="history-meta">${item.timestamp} | ${translateFormat(item.format)}</div>
                         </div>
-                        <button onclick="copyToClipboard('${item.code}')" class="action-btn">📋</button>
+                        <button onclick="copyToClipboard('${item.code}')" class="history-copy">העתק</button>
                     </div>
                 `).join('');
             }
@@ -653,18 +823,36 @@
         // העתק מהיסטוריה
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text);
+            vibrate();
         }
 
         // הצג שגיאה
         function showError(message) {
-            resultSection.style.display = 'block';
-            resultSection.className = 'result-section error';
+            resultCard.style.display = 'block';
+            resultCard.className = 'result-card error';
             barcodeDisplay.textContent = message;
         }
 
         // הצג טעינה
         function showLoading(show) {
             loading.style.display = show ? 'block' : 'none';
+        }
+
+        // עדכן סטטוס
+        function updateStatus(text, active) {
+            statusText.textContent = text;
+            statusDot.className = active ? 'status-dot active' : 'status-dot';
+        }
+
+        // רטט
+        function vibrate() {
+            if (navigator.vibrate) {
+                navigator.vibrate(200);
+            }
+            document.body.classList.add('vibrate-feedback');
+            setTimeout(() => {
+                document.body.classList.remove('vibrate-feedback');
+            }, 300);
         }
 
         // טען היסטוריה בטעינת הדף
@@ -676,6 +864,16 @@
                 Quagga.stop();
             }
         });
+
+        // מנע zoom על double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            var now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 </body>
 </html>
