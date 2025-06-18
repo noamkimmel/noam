@@ -574,7 +574,7 @@
             startScanning();
         });
 
-        // התחלת סריקה - פשוט ויעיל
+        // התחלת סריקה - רזולוציה גבוהה מקסימלית
         async function startScanning() {
             if (isScanning) return;
 
@@ -584,27 +584,38 @@
                 startBtn.style.display = 'none';
                 stopBtn.style.display = 'block';
 
-                // בקש מצלמה בהגדרות הכי פשוטות
+                // בקש מצלמה ברזולוציה הכי גבוהה
                 videoStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
-                        facingMode: 'environment'
+                        facingMode: 'environment',
+                        width: { ideal: 3840, min: 1920 }, // 4K אם זמין
+                        height: { ideal: 2160, min: 1080 }
                     } 
                 });
 
                 videoTrack = videoStream.getVideoTracks()[0];
+                
+                // הדפס מידע על המצלמה
+                const settings = videoTrack.getSettings();
+                console.log('רזולוציה בפועל:', settings.width, 'x', settings.height);
 
                 await Quagga.init({
                     inputStream: {
                         name: "Live",
                         type: "LiveStream",
-                        target: document.querySelector('#scanner')
+                        target: document.querySelector('#scanner'),
+                        constraints: {
+                            width: { ideal: 3840, min: 1920 },
+                            height: { ideal: 2160, min: 1080 },
+                            facingMode: "environment"
+                        },
                     },
                     locator: {
                         patchSize: "x-large",
                         halfSample: false
                     },
-                    numOfWorkers: 8,
-                    frequency: 25,
+                    numOfWorkers: navigator.hardwareConcurrency || 8,
+                    frequency: 30,
                     decoder: {
                         readers: [
                             "ean_reader",
@@ -613,7 +624,8 @@
                             "upc_reader",
                             "upc_e_reader",
                             "code_39_reader",
-                            "codabar_reader"
+                            "codabar_reader",
+                            "i2of5_reader"
                         ]
                     },
                     locate: true
@@ -625,39 +637,100 @@
                 showLoading(false);
                 updateStatus('סורק ברקודים...', true);
 
-                // סריקה פשוטה ויעילה
+                // סריקה עם רגישות גבוהה
                 let detectionCount = {};
+                let lastDetectionTime = 0;
                 
                 Quagga.onDetected((result) => {
                     const code = result.codeResult.code;
+                    const now = Date.now();
                     
-                    // בדיקת תקינות
-                    if (code.length < 7 || code.length > 15 || !/^\d+$/.test(code)) {
+                    // בדיקת תקינות רחבה יותר
+                    if (code.length < 6 || code.length > 18 || !/^\d+$/.test(code)) {
                         return;
                     }
+                    
+                    console.log('זוהה קוד:', code, 'אורך:', code.length);
                     
                     // ספור זיהויים
                     detectionCount[code] = (detectionCount[code] || 0) + 1;
                     
-                    // אשר אחרי 3 זיהויים
-                    if (detectionCount[code] >= 3) {
+                    // אשר אחרי 2 זיהויים בלבד (יותר רגיש)
+                    if (detectionCount[code] >= 2) {
+                        console.log('קוד אושר:', code);
                         vibrate();
                         onBarcodeDetected(result);
                         detectionCount = {}; // איפוס
+                        lastDetectionTime = now;
                     }
                     
-                    // נקה ספירות ישנות כל 50 זיהויים
-                    if (Object.keys(detectionCount).length > 50) {
+                    // נקה ספירות כל 3 שניות
+                    if (now - lastDetectionTime > 3000) {
                         detectionCount = {};
                     }
                 });
 
             } catch (error) {
                 console.error('שגיאה בהפעלת הסורק:', error);
-                resetButtons();
-                showLoading(false);
-                updateStatus('שגיאה במצלמה', false);
-                // בלי הודעת שגיאה אדומה
+                
+                // נסה שוב עם רזולוציה נמוכה יותר אם נכשל
+                try {
+                    console.log('מנסה רזולוציה נמוכה יותר...');
+                    
+                    videoStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'environment',
+                            width: { ideal: 1920, min: 1280 },
+                            height: { ideal: 1080, min: 720 }
+                        } 
+                    });
+
+                    await Quagga.init({
+                        inputStream: {
+                            name: "Live",
+                            type: "LiveStream",
+                            target: document.querySelector('#scanner'),
+                            constraints: {
+                                width: { ideal: 1920, min: 1280 },
+                                height: { ideal: 1080, min: 720 },
+                                facingMode: "environment"
+                            },
+                        },
+                        locator: {
+                            patchSize: "x-large",
+                            halfSample: false
+                        },
+                        numOfWorkers: 8,
+                        frequency: 30,
+                        decoder: {
+                            readers: [
+                                "ean_reader",
+                                "ean_8_reader",
+                                "code_128_reader", 
+                                "upc_reader",
+                                "upc_e_reader",
+                                "code_39_reader",
+                                "codabar_reader",
+                                "i2of5_reader"
+                            ]
+                        },
+                        locate: true
+                    });
+
+                    Quagga.start();
+                    isScanning = true;
+                    cameraContainer.style.display = 'block';
+                    showLoading(false);
+                    updateStatus('סורק ברקודים...', true);
+                    
+                    console.log('הצליח עם רזולוציה נמוכה יותר');
+                    
+                } catch (secondError) {
+                    console.error('גם הניסיון השני נכשל:', secondError);
+                    resetButtons();
+                    showLoading(false);
+                    updateStatus('שגיאה במצלמה', false);
+                }
             }
         }
 
