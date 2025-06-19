@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מעבד התמונות המתקדם</title>
+    <title>מחולל אמנות קווים - String Art</title>
     <style>
         * {
             margin: 0;
@@ -12,14 +12,15 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #2d2d5f 100%);
             min-height: 100vh;
             color: white;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -27,35 +28,61 @@
         .header {
             text-align: center;
             margin-bottom: 40px;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
         }
 
         .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #fff, #f0f0f0);
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #00d4ff, #ff00aa, #ffaa00);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            font-weight: 700;
         }
 
         .upload-section {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 20px;
-            padding: 30px;
+            padding: 40px;
             margin-bottom: 30px;
             text-align: center;
-            backdrop-filter: blur(10px);
-            border: 2px dashed rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
+            backdrop-filter: blur(15px);
+            border: 2px dashed rgba(0, 212, 255, 0.3);
+            transition: all 0.4s ease;
+            position: relative;
         }
 
         .upload-section:hover {
-            border-color: rgba(255, 255, 255, 0.6);
+            border-color: rgba(0, 212, 255, 0.8);
             transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
         }
 
         .file-input {
@@ -63,138 +90,252 @@
         }
 
         .upload-btn {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
             color: white;
-            padding: 15px 40px;
+            padding: 18px 50px;
             border: none;
             border-radius: 50px;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(0, 212, 255, 0.4);
         }
 
         .controls {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
 
         .control-group {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .control-group:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
 
         .control-group h3 {
-            margin-bottom: 15px;
-            color: #fff;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .slider-container {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
 
         .slider {
             width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255, 255, 255, 0.3);
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
             outline: none;
             -webkit-appearance: none;
+            transition: all 0.3s ease;
         }
 
         .slider::-webkit-slider-thumb {
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: #4CAF50;
+            background: linear-gradient(45deg, #00d4ff, #ff00aa);
             cursor: pointer;
-        }
-
-        .filter-btn {
-            background: linear-gradient(45deg, #9C27B0, #673AB7);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            margin: 5px;
-            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
             transition: all 0.3s ease;
         }
 
-        .filter-btn:hover {
-            transform: scale(1.05);
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+        }
+
+        .preset-btn {
+            background: linear-gradient(45deg, #9C27B0, #673AB7);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+        }
+
+        .preset-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
+        }
+
+        .generate-btn {
+            background: linear-gradient(45deg, #ff00aa, #ff6600);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 32px rgba(255, 0, 170, 0.3);
+            width: 100%;
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(255, 0, 170, 0.4);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .results {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
         }
 
         .image-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 25px;
+            padding: 30px;
             text-align: center;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: all 0.6s ease;
+        }
+
+        .image-container:hover::before {
+            left: 100%;
         }
 
         .image-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
         }
 
         .image-container h3 {
-            margin-bottom: 15px;
-            color: #fff;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            font-size: 1.3rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            display: inline-block;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
         .image-display {
             max-width: 100%;
             height: auto;
             border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .face-detection-info {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            text-align: right;
-        }
-
-        .face-count {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #4CAF50;
+            transition: all 0.3s ease;
         }
 
         .loading {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #00d4ff, #ff00aa);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #4CAF50;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid #00d4ff;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 20px;
         }
 
         @keyframes spin {
@@ -202,112 +343,243 @@
             100% { transform: rotate(360deg); }
         }
 
+        .download-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .stats {
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
         .error {
             background: rgba(244, 67, 54, 0.2);
             border: 1px solid #f44336;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
             display: none;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .results {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎨 מעבד התמונות המתקדם</h1>
-            <p>העלו תמונה וצפו בקסם של זיהוי פנים ועיבוד תמונה מתקדם</p>
+            <div class="header-content">
+                <h1>🎨 מחולל אמנות קווים</h1>
+                <p>הפכו תמונות לאמנות גיאומטרית מהפנטת עם אלגוריתם String Art מתקדם</p>
+            </div>
         </div>
 
         <div class="upload-section">
             <input type="file" id="imageUpload" class="file-input" accept="image/*">
             <button class="upload-btn" onclick="document.getElementById('imageUpload').click()">
-                📸 בחרו תמונה
+                🖼️ בחרו תמונה ליצירת אמנות
             </button>
-            <p style="margin-top: 15px; opacity: 0.8;">תומך בפורמטים: JPG, PNG, GIF</p>
+            <p style="margin-top: 20px; opacity: 0.8;">תומך בפורמטים: JPG, PNG, GIF | מומלץ: תמונות עם ניגודיות גבוהה</p>
         </div>
 
         <div class="error" id="error"></div>
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>מעבד את התמונה...</p>
-        </div>
 
         <div class="controls" id="controls" style="display: none;">
             <div class="control-group">
-                <h3>🎛️ בקרות תמונה</h3>
+                <h3>⚙️ הגדרות בסיסיות</h3>
                 <div class="slider-container">
-                    <label>בהירות: <span id="brightnessValue">100</span>%</label>
-                    <input type="range" class="slider" id="brightness" min="0" max="200" value="100">
+                    <div class="slider-label">
+                        <span>מספר נקודות:</span>
+                        <span id="pointsValue">150</span>
+                    </div>
+                    <input type="range" class="slider" id="points" min="50" max="500" value="150">
                 </div>
                 <div class="slider-container">
-                    <label>ניגודיות: <span id="contrastValue">100</span>%</label>
-                    <input type="range" class="slider" id="contrast" min="0" max="200" value="100">
+                    <div class="slider-label">
+                        <span>מספר קווים:</span>
+                        <span id="linesValue">2000</span>
+                    </div>
+                    <input type="range" class="slider" id="lines" min="500" max="5000" value="2000">
                 </div>
                 <div class="slider-container">
-                    <label>רוויה: <span id="saturationValue">100</span>%</label>
-                    <input type="range" class="slider" id="saturation" min="0" max="200" value="100">
+                    <div class="slider-label">
+                        <span>עובי קו:</span>
+                        <span id="lineWidthValue">0.5</span>
+                    </div>
+                    <input type="range" class="slider" id="lineWidth" min="0.1" max="2" step="0.1" value="0.5">
                 </div>
             </div>
 
             <div class="control-group">
-                <h3>🎨 פילטרים</h3>
-                <button class="filter-btn" onclick="applyFilter('none')">מקורי</button>
-                <button class="filter-btn" onclick="applyFilter('grayscale')">שחור לבן</button>
-                <button class="filter-btn" onclick="applyFilter('sepia')">ספיה</button>
-                <button class="filter-btn" onclick="applyFilter('blur')">טשטוש</button>
-                <button class="filter-btn" onclick="applyFilter('sharpen')">חידוד</button>
-                <button class="filter-btn" onclick="applyFilter('vintage')">וינטג'</button>
+                <h3>🎨 עיצוב ויזואלי</h3>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>שקיפות קווים:</span>
+                        <span id="opacityValue">30</span>%
+                    </div>
+                    <input type="range" class="slider" id="opacity" min="5" max="100" value="30">
+                </div>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>ניגודיות:</span>
+                        <span id="contrastValue">120</span>%
+                    </div>
+                    <input type="range" class="slider" id="contrast" min="50" max="200" value="120">
+                </div>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>חדות קצוות:</span>
+                        <span id="edgeValue">80</span>%
+                    </div>
+                    <input type="range" class="slider" id="edge" min="0" max="100" value="80">
+                </div>
             </div>
 
             <div class="control-group">
-                <h3>👤 זיהוי פנים</h3>
-                <button class="filter-btn" onclick="detectFaces()">זהה פנים</button>
-                <button class="filter-btn" onclick="blurFaces()">טשטש פנים</button>
-                <button class="filter-btn" onclick="highlightFaces()">הדגש פנים</button>
+                <h3>🎭 פריסטים מוכנים</h3>
+                <button class="preset-btn" onclick="applyPreset('detailed')">מפורט</button>
+                <button class="preset-btn" onclick="applyPreset('minimal')">מינימלי</button>
+                <button class="preset-btn" onclick="applyPreset('artistic')">אמנותי</button>
+                <button class="preset-btn" onclick="applyPreset('geometric')">גיאומטרי</button>
+                <button class="preset-btn" onclick="applyPreset('dense')">צפוף</button>
+                <button class="preset-btn" onclick="applyPreset('ethereal')">אתרי</button>
             </div>
+
+            <div class="control-group">
+                <h3>🚀 ייצור</h3>
+                <button class="generate-btn" id="generateBtn" onclick="generateStringArt()">
+                    צרו אמנות קווים
+                </button>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <h3>יוצר אמנות קווים...</h3>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <p id="progressText">מכין את הקנבס...</p>
         </div>
 
         <div class="results" id="results" style="display: none;">
             <div class="image-container">
                 <h3>תמונה מקורית</h3>
-                <canvas id="originalCanvas" class="image-display"></canvas>
+                <div class="canvas-wrapper">
+                    <canvas id="originalCanvas" class="image-display"></canvas>
+                </div>
             </div>
             <div class="image-container">
-                <h3>תמונה מעובדת</h3>
-                <canvas id="processedCanvas" class="image-display"></canvas>
-                <div class="face-detection-info" id="faceInfo" style="display: none;">
-                    <div class="face-count" id="faceCount">נמצאו 0 פנים</div>
+                <h3>אמנות קווים</h3>
+                <div class="canvas-wrapper">
+                    <canvas id="stringCanvas" class="image-display"></canvas>
+                </div>
+                <button class="download-btn" onclick="downloadArt()">💾 הורד יצירה</button>
+                <div class="stats" id="stats" style="display: none;">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalPoints">0</div>
+                            <div class="stat-label">נקודות</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalLines">0</div>
+                            <div class="stat-label">קווים</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalLength">0</div>
+                            <div class="stat-label">מ"מ חוט</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="processingTime">0</div>
+                            <div class="stat-label">שניות</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let originalImageData = null;
-        let processedImageData = null;
-        let detectedFaces = [];
-        let originalCanvas, processedCanvas, originalCtx, processedCtx;
+        let originalImage = null;
+        let originalCanvas, stringCanvas, originalCtx, stringCtx;
+        let imageData = null;
+        let isGenerating = false;
 
+        // Initialize event listeners
         document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
-
-        // Initialize sliders
-        document.getElementById('brightness').addEventListener('input', updateImage);
-        document.getElementById('contrast').addEventListener('input', updateImage);
-        document.getElementById('saturation').addEventListener('input', updateImage);
+        
+        // Update slider values
+        const sliders = ['points', 'lines', 'lineWidth', 'opacity', 'contrast', 'edge'];
+        sliders.forEach(slider => {
+            const element = document.getElementById(slider);
+            element.addEventListener('input', () => {
+                document.getElementById(slider + 'Value').textContent = 
+                    slider === 'lineWidth' ? element.value : 
+                    slider === 'opacity' || slider === 'contrast' || slider === 'edge' ? element.value + (slider === 'contrast' ? '%' : '%') :
+                    element.value;
+            });
+        });
 
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            showLoading();
-            
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     setupCanvases(img);
-                    hideLoading();
                     showControls();
                 };
                 img.src = e.target.result;
@@ -316,301 +588,198 @@
         }
 
         function setupCanvases(img) {
+            originalImage = img;
             originalCanvas = document.getElementById('originalCanvas');
-            processedCanvas = document.getElementById('processedCanvas');
+            stringCanvas = document.getElementById('stringCanvas');
             originalCtx = originalCanvas.getContext('2d');
-            processedCtx = processedCanvas.getContext('2d');
+            stringCtx = stringCanvas.getContext('2d');
 
-            // Set canvas size
-            const maxWidth = 400;
-            const maxHeight = 300;
+            // Calculate dimensions
+            const maxSize = 400;
             let { width, height } = img;
+            const ratio = Math.min(maxSize / width, maxSize / height);
+            width *= ratio;
+            height *= ratio;
 
-            if (width > maxWidth || height > maxHeight) {
-                const ratio = Math.min(maxWidth / width, maxHeight / height);
-                width *= ratio;
-                height *= ratio;
-            }
-
-            originalCanvas.width = processedCanvas.width = width;
-            originalCanvas.height = processedCanvas.height = height;
+            // Set canvas sizes
+            [originalCanvas, stringCanvas].forEach(canvas => {
+                canvas.width = width;
+                canvas.height = height;
+            });
 
             // Draw original image
             originalCtx.drawImage(img, 0, 0, width, height);
-            processedCtx.drawImage(img, 0, 0, width, height);
-
-            // Store image data
-            originalImageData = originalCtx.getImageData(0, 0, width, height);
-            processedImageData = processedCtx.getImageData(0, 0, width, height);
-        }
-
-        function updateImage() {
-            if (!originalImageData) return;
-
-            const brightness = document.getElementById('brightness').value;
-            const contrast = document.getElementById('contrast').value;
-            const saturation = document.getElementById('saturation').value;
-
-            document.getElementById('brightnessValue').textContent = brightness;
-            document.getElementById('contrastValue').textContent = contrast;
-            document.getElementById('saturationValue').textContent = saturation;
-
-            // Apply adjustments
-            const imageData = new ImageData(
-                new Uint8ClampedArray(originalImageData.data),
-                originalImageData.width,
-                originalImageData.height
-            );
-
-            applyAdjustments(imageData, brightness, contrast, saturation);
-            processedCtx.putImageData(imageData, 0, 0);
-            processedImageData = imageData;
-        }
-
-        function applyAdjustments(imageData, brightness, contrast, saturation) {
-            const data = imageData.data;
-            const brightnessFactor = brightness / 100;
-            const contrastFactor = contrast / 100;
-            const saturationFactor = saturation / 100;
-
-            for (let i = 0; i < data.length; i += 4) {
-                let r = data[i];
-                let g = data[i + 1];
-                let b = data[i + 2];
-
-                // Apply brightness
-                r *= brightnessFactor;
-                g *= brightnessFactor;
-                b *= brightnessFactor;
-
-                // Apply contrast
-                r = ((r / 255 - 0.5) * contrastFactor + 0.5) * 255;
-                g = ((g / 255 - 0.5) * contrastFactor + 0.5) * 255;
-                b = ((b / 255 - 0.5) * contrastFactor + 0.5) * 255;
-
-                // Apply saturation
-                const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-                r = gray + (r - gray) * saturationFactor;
-                g = gray + (g - gray) * saturationFactor;
-                b = gray + (b - gray) * saturationFactor;
-
-                data[i] = Math.max(0, Math.min(255, r));
-                data[i + 1] = Math.max(0, Math.min(255, g));
-                data[i + 2] = Math.max(0, Math.min(255, b));
-            }
-        }
-
-        function applyFilter(filterType) {
-            if (!originalImageData) return;
-
-            const imageData = new ImageData(
-                new Uint8ClampedArray(originalImageData.data),
-                originalImageData.width,
-                originalImageData.height
-            );
-
-            switch (filterType) {
-                case 'grayscale':
-                    applyGrayscale(imageData);
-                    break;
-                case 'sepia':
-                    applySepia(imageData);
-                    break;
-                case 'blur':
-                    applyBlur(imageData);
-                    break;
-                case 'sharpen':
-                    applySharpen(imageData);
-                    break;
-                case 'vintage':
-                    applyVintage(imageData);
-                    break;
-                default:
-                    // Original image
-                    break;
-            }
-
-            processedCtx.putImageData(imageData, 0, 0);
-            processedImageData = imageData;
-
-            // Reset sliders
-            document.getElementById('brightness').value = 100;
-            document.getElementById('contrast').value = 100;
-            document.getElementById('saturation').value = 100;
-            document.getElementById('brightnessValue').textContent = '100';
-            document.getElementById('contrastValue').textContent = '100';
-            document.getElementById('saturationValue').textContent = '100';
-        }
-
-        function applyGrayscale(imageData) {
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-                data[i] = data[i + 1] = data[i + 2] = gray;
-            }
-        }
-
-        function applySepia(imageData) {
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
-                
-                data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
-                data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
-                data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
-            }
-        }
-
-        function applyBlur(imageData) {
-            const data = imageData.data;
-            const width = imageData.width;
-            const height = imageData.height;
-            const newData = new Uint8ClampedArray(data);
-
-            for (let y = 1; y < height - 1; y++) {
-                for (let x = 1; x < width - 1; x++) {
-                    const idx = (y * width + x) * 4;
-                    
-                    for (let c = 0; c < 3; c++) {
-                        let sum = 0;
-                        for (let dy = -1; dy <= 1; dy++) {
-                            for (let dx = -1; dx <= 1; dx++) {
-                                const pixelIdx = ((y + dy) * width + (x + dx)) * 4 + c;
-                                sum += data[pixelIdx];
-                            }
-                        }
-                        newData[idx + c] = sum / 9;
-                    }
-                }
-            }
             
-            for (let i = 0; i < data.length; i++) {
-                data[i] = newData[i];
-            }
-        }
-
-        function applySharpen(imageData) {
-            const data = imageData.data;
-            const width = imageData.width;
-            const height = imageData.height;
-            const newData = new Uint8ClampedArray(data);
-
-            const kernel = [
-                [0, -1, 0],
-                [-1, 5, -1],
-                [0, -1, 0]
-            ];
-
-            for (let y = 1; y < height - 1; y++) {
-                for (let x = 1; x < width - 1; x++) {
-                    const idx = (y * width + x) * 4;
-                    
-                    for (let c = 0; c < 3; c++) {
-                        let sum = 0;
-                        for (let ky = 0; ky < 3; ky++) {
-                            for (let kx = 0; kx < 3; kx++) {
-                                const pixelIdx = ((y + ky - 1) * width + (x + kx - 1)) * 4 + c;
-                                sum += data[pixelIdx] * kernel[ky][kx];
-                            }
-                        }
-                        newData[idx + c] = Math.max(0, Math.min(255, sum));
-                    }
-                }
-            }
+            // Get image data
+            imageData = originalCtx.getImageData(0, 0, width, height);
             
-            for (let i = 0; i < data.length; i++) {
-                data[i] = newData[i];
-            }
+            // Clear string canvas
+            stringCtx.fillStyle = '#000000';
+            stringCtx.fillRect(0, 0, width, height);
         }
 
-        function applyVintage(imageData) {
-            applySepia(imageData);
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                data[i] *= 0.9;
-                data[i + 1] *= 0.85;
-                data[i + 2] *= 0.7;
-            }
+        function applyPreset(preset) {
+            const presets = {
+                detailed: { points: 200, lines: 3000, lineWidth: 0.3, opacity: 25, contrast: 140, edge: 90 },
+                minimal: { points: 80, lines: 800, lineWidth: 0.8, opacity: 60, contrast: 100, edge: 40 },
+                artistic: { points: 150, lines: 2500, lineWidth: 0.4, opacity: 35, contrast: 130, edge: 75 },
+                geometric: { points: 120, lines: 1500, lineWidth: 0.6, opacity: 45, contrast: 110, edge: 60 },
+                dense: { points: 300, lines: 4000, lineWidth: 0.2, opacity: 20, contrast: 150, edge: 95 },
+                ethereal: { points: 100, lines: 1200, lineWidth: 0.5, opacity: 15, contrast: 90, edge: 30 }
+            };
+
+            const config = presets[preset];
+            if (!config) return;
+
+            Object.keys(config).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = config[key];
+                    element.dispatchEvent(new Event('input'));
+                }
+            });
         }
 
-        // Face detection simulation (basic implementation)
-        function detectFaces() {
-            if (!processedImageData) return;
+        async function generateStringArt() {
+            if (!imageData || isGenerating) return;
 
+            isGenerating = true;
+            const startTime = Date.now();
+            
             showLoading();
-            
-            // Simulate face detection with random rectangles
-            setTimeout(() => {
-                const faceCount = Math.floor(Math.random() * 4) + 1;
-                detectedFaces = [];
+            document.getElementById('generateBtn').disabled = true;
+
+            try {
+                // Get parameters
+                const numPoints = parseInt(document.getElementById('points').value);
+                const numLines = parseInt(document.getElementById('lines').value);
+                const lineWidth = parseFloat(document.getElementById('lineWidth').value);
+                const opacity = parseInt(document.getElementById('opacity').value) / 100;
+                const contrast = parseInt(document.getElementById('contrast').value) / 100;
+                const edgeThreshold = parseInt(document.getElementById('edge').value) / 100;
+
+                await createStringArt(numPoints, numLines, lineWidth, opacity, contrast, edgeThreshold, startTime);
                 
-                for (let i = 0; i < faceCount; i++) {
-                    const x = Math.random() * (processedCanvas.width - 60);
-                    const y = Math.random() * (processedCanvas.height - 60);
-                    const width = 40 + Math.random() * 40;
-                    const height = 40 + Math.random() * 40;
-                    
-                    detectedFaces.push({ x, y, width, height });
+            } catch (error) {
+                showError('שגיאה ביצירת האמנות: ' + error.message);
+            } finally {
+                isGenerating = false;
+                hideLoading();
+                document.getElementById('generateBtn').disabled = false;
+            }
+        }
+
+        async function createStringArt(numPoints, numLines, lineWidth, opacity, contrast, edgeThreshold, startTime) {
+            const width = stringCanvas.width;
+            const height = stringCanvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) * 0.45;
+
+            // Clear canvas
+            stringCtx.fillStyle = '#000000';
+            stringCtx.fillRect(0, 0, width, height);
+
+            updateProgress(10, 'מחשב נקודות עוגן...');
+
+            // Generate anchor points in circle
+            const points = [];
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (i / numPoints) * 2 * Math.PI;
+                points.push({
+                    x: centerX + radius * Math.cos(angle),
+                    y: centerY + radius * Math.sin(angle),
+                    index: i
+                });
+            }
+
+            updateProgress(20, 'מכין מפת עוצמה...');
+
+            // Process image data with enhanced contrast and edge detection
+            const processedData = new Uint8ClampedArray(imageData.data);
+            
+            // Apply contrast
+            for (let i = 0; i < processedData.length; i += 4) {
+                const gray = 0.299 * processedData[i] + 0.587 * processedData[i + 1] + 0.114 * processedData[i + 2];
+                const enhancedGray = Math.pow(gray / 255, 1 / contrast) * 255;
+                processedData[i] = processedData[i + 1] = processedData[i + 2] = enhancedGray;
+            }
+
+            // Edge detection
+            const edgeData = detectEdges(processedData, width, height, edgeThreshold);
+
+            updateProgress(30, 'מחשב מסלולי קווים אופטימליים...');
+
+            // String art algorithm
+            const lines = [];
+            let currentPoint = 0;
+            const usedConnections = new Set();
+
+            stringCtx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+            stringCtx.lineWidth = lineWidth;
+            stringCtx.lineCap = 'round';
+
+            for (let lineCount = 0; lineCount < numLines; lineCount++) {
+                if (lineCount % 100 === 0) {
+                    updateProgress(30 + (lineCount / numLines) * 60, `מצייר קו ${lineCount + 1} מתוך ${numLines}...`);
+                    await sleep(1);
                 }
 
-                highlightFaces();
-                updateFaceInfo(faceCount);
-                hideLoading();
-            }, 1500);
-        }
+                let bestScore = -1;
+                let bestNextPoint = -1;
 
-        function highlightFaces() {
-            if (!processedImageData || detectedFaces.length === 0) return;
+                // Find best next point
+                for (let i = 0; i < numPoints; i++) {
+                    if (i === currentPoint) continue;
+                    
+                    const connectionKey = `${Math.min(currentPoint, i)}-${Math.max(currentPoint, i)}`;
+                    if (usedConnections.has(connectionKey)) continue;
 
-            processedCtx.putImageData(processedImageData, 0, 0);
+                    const score = calculateLineScore(points[currentPoint], points[i], edgeData, width, height);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestNextPoint = i;
+                    }
+                }
 
-            processedCtx.strokeStyle = '#4CAF50';
-            processedCtx.lineWidth = 3;
-            processedCtx.fillStyle = 'rgba(76, 175, 80, 0.2)';
+                if (bestNextPoint === -1) {
+                    // Find any unused connection
+                    for (let i = 0; i < numPoints; i++) {
+                        if (i === currentPoint) continue;
+                        const connectionKey = `${Math.min(currentPoint, i)}-${Math.max(currentPoint, i)}`;
+                        if (!usedConnections.has(connectionKey)) {
+                            bestNextPoint = i;
+                            break;
+                        }
+                    }
+                }
 
-            detectedFaces.forEach(face => {
-                processedCtx.strokeRect(face.x, face.y, face.width, face.height);
-                processedCtx.fillRect(face.x, face.y, face.width, face.height);
+                if (bestNextPoint !== -1) {
+                    const connectionKey = `${Math.min(currentPoint, bestNextPoint)}-${Math.max(currentPoint, bestNextPoint)}`;
+                    usedConnections.add(connectionKey);
+
+                    // Draw line
+                    stringCtx.beginPath();
+                    stringCtx.moveTo(points[currentPoint].x, points[currentPoint].y);
+                    stringCtx.lineTo(points[bestNextPoint].x, points[bestNextPoint].y);
+                    stringCtx.stroke();
+
+                    lines.push([currentPoint, bestNextPoint]);
+                    currentPoint = bestNextPoint;
+                }
+            }
+
+            updateProgress(95, 'מסיים עיבוד...');
+
+            // Draw anchor points
+            stringCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            points.forEach(point => {
+                stringCtx.beginPath();
+                stringCtx.arc(point.x, point.y, 1.5, 0, 2 * Math.PI);
+                stringCtx.fill();
             });
-        }
 
-        function blurFaces() {
-            if (!processedImageData || detectedFaces.length === 0) return;
-
-            processedCtx.putImageData(processedImageData, 0, 0);
-
-            detectedFaces.forEach(face => {
-                const faceImageData = processedCtx.getImageData(face.x, face.y, face.width, face.height);
-                applyBlur(faceImageData);
-                processedCtx.putImageData(faceImageData, face.x, face.y);
-            });
-        }
-
-        function updateFaceInfo(count) {
-            document.getElementById('faceCount').textContent = `נמצאו ${count} פנים`;
-            document.getElementById('faceInfo').style.display = 'block';
-        }
-
-        function showLoading() {
-            document.getElementById('loading').style.display = 'block';
-        }
-
-        function hideLoading() {
-            document.getElementById('loading').style.display = 'none';
-        }
-
-        function showControls() {
-            document.getElementById('controls').style.display = 'grid';
-            document.getElementById('results').style.display = 'grid';
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-        }
-    </script>
-</body>
-</html>
+            // Calculate statistics
+            const totalLength = lines.reduce((sum, line) => {
+                const p1 = points[line[0]];
+                const p2 = points[line[1]];
