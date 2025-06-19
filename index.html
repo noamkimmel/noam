@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מחולל אמנות קווים - String Art</title>
+    <title>מחולל String Art מתקדם</title>
     <style>
         * {
             margin: 0;
@@ -12,136 +12,93 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #2d2d5f 100%);
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             color: white;
-            overflow-x: hidden;
+            padding: 20px;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 25px;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate {
-            100% { transform: rotate(360deg); }
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 1;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
 
         .header h1 {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
-            background: linear-gradient(45deg, #00d4ff, #ff00aa, #ffaa00);
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00d4ff, #ff0080);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-weight: 700;
         }
 
         .upload-section {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
             text-align: center;
-            backdrop-filter: blur(15px);
-            border: 2px dashed rgba(0, 212, 255, 0.3);
-            transition: all 0.4s ease;
-            position: relative;
+            border: 2px dashed rgba(0, 212, 255, 0.5);
+            transition: all 0.3s ease;
         }
 
         .upload-section:hover {
             border-color: rgba(0, 212, 255, 0.8);
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
         }
 
         .file-input {
             display: none;
         }
 
-        .upload-btn {
-            background: linear-gradient(45deg, #00d4ff, #0099cc);
-            color: white;
-            padding: 18px 50px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .upload-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 12px 40px rgba(0, 212, 255, 0.4);
-        }
-
         .controls {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
         .control-group {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 25px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .control-group:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
         }
 
         .control-group h3 {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #00d4ff;
-            font-size: 1.2rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .slider-container {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .slider-label {
@@ -149,72 +106,60 @@
             justify-content: space-between;
             margin-bottom: 8px;
             font-size: 0.9rem;
-            opacity: 0.9;
         }
 
         .slider {
             width: 100%;
-            height: 8px;
-            border-radius: 4px;
+            height: 6px;
+            border-radius: 3px;
             background: rgba(255, 255, 255, 0.2);
             outline: none;
             -webkit-appearance: none;
-            transition: all 0.3s ease;
         }
 
         .slider::-webkit-slider-thumb {
             appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: linear-gradient(45deg, #00d4ff, #ff00aa);
+            background: #00d4ff;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+            box-shadow: 0 2px 10px rgba(0, 212, 255, 0.5);
         }
 
         .preset-btn {
             background: linear-gradient(45deg, #9C27B0, #673AB7);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
+            padding: 10px 20px;
+            border-radius: 20px;
             margin: 5px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 500;
-            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
         }
 
         .preset-btn:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
+            transform: translateY(-2px);
         }
 
         .generate-btn {
-            background: linear-gradient(45deg, #ff00aa, #ff6600);
+            background: linear-gradient(45deg, #ff0080, #ff6600);
             color: white;
+            padding: 18px 40px;
             border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 1.1rem;
+            border-radius: 30px;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: all 0.4s ease;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 8px 32px rgba(255, 0, 170, 0.3);
             width: 100%;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 0, 128, 0.3);
         }
 
         .generate-btn:hover:not(:disabled) {
             transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(255, 0, 170, 0.4);
+            box-shadow: 0 8px 30px rgba(255, 0, 128, 0.4);
         }
 
         .generate-btn:disabled {
@@ -224,108 +169,39 @@
 
         .results {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 40px;
-            margin-top: 40px;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
         }
 
         .image-container {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 25px;
-            padding: 30px;
+            border-radius: 20px;
+            padding: 25px;
             text-align: center;
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .image-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: all 0.6s ease;
-        }
-
-        .image-container:hover::before {
-            left: 100%;
-        }
-
-        .image-container:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
         }
 
         .image-container h3 {
             margin-bottom: 20px;
             color: #00d4ff;
             font-size: 1.3rem;
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
         }
 
-        .canvas-wrapper {
-            position: relative;
-            display: inline-block;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .image-display {
+        .canvas-display {
             max-width: 100%;
-            height: auto;
             border-radius: 15px;
-            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
         .loading {
             display: none;
             text-align: center;
             padding: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            backdrop-filter: blur(15px);
-        }
-
-        .progress-container {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(45deg, #00d4ff, #ff00aa);
-            border-radius: 3px;
-            width: 0%;
-            transition: width 0.3s ease;
-            position: relative;
-        }
-
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shimmer 1.5s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
 
         .spinner {
@@ -343,6 +219,23 @@
             100% { transform: rotate(360deg); }
         }
 
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #00d4ff, #ff0080);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
         .download-btn {
             background: linear-gradient(45deg, #4CAF50, #45a049);
             color: white;
@@ -352,18 +245,15 @@
             margin-top: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 500;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
         }
 
         .download-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
         }
 
         .stats {
             background: rgba(0, 212, 255, 0.1);
-            border-radius: 15px;
+            border-radius: 10px;
             padding: 15px;
             margin-top: 15px;
             border: 1px solid rgba(0, 212, 255, 0.3);
@@ -371,13 +261,9 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             text-align: center;
-        }
-
-        .stat-item {
-            padding: 8px;
         }
 
         .stat-value {
@@ -394,23 +280,18 @@
         .error {
             background: rgba(244, 67, 54, 0.2);
             border: 1px solid #f44336;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 15px 0;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
             display: none;
             text-align: center;
         }
 
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2.5rem;
-            }
-            
-            .controls {
+            .results {
                 grid-template-columns: 1fr;
             }
-            
-            .results {
+            .controls {
                 grid-template-columns: 1fr;
             }
         }
@@ -419,130 +300,112 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="header-content">
-                <h1>🎨 מחולל אמנות קווים</h1>
-                <p>הפכו תמונות לאמנות גיאומטרית מהפנטת עם אלגוריתם String Art מתקדם</p>
-            </div>
+            <h1>🎨 String Art Generator</h1>
+            <p>אלגוריתם מתקדם ליצירת אמנות קווים מתמונות</p>
         </div>
 
         <div class="upload-section">
             <input type="file" id="imageUpload" class="file-input" accept="image/*">
             <button class="upload-btn" onclick="document.getElementById('imageUpload').click()">
-                🖼️ בחרו תמונה ליצירת אמנות
+                🖼️ בחרו תמונה ליצירה
             </button>
-            <p style="margin-top: 20px; opacity: 0.8;">תומך בפורמטים: JPG, PNG, GIF | מומלץ: תמונות עם ניגודיות גבוהה</p>
+            <p style="margin-top: 15px; opacity: 0.8;">תומך בכל פורמטי התמונה | מומלץ: תמונות עם ניגודיות גבוהה</p>
         </div>
 
         <div class="error" id="error"></div>
 
         <div class="controls" id="controls" style="display: none;">
             <div class="control-group">
-                <h3>⚙️ הגדרות בסיסיות</h3>
+                <h3>⚙️ הגדרות String Art</h3>
                 <div class="slider-container">
                     <div class="slider-label">
-                        <span>מספר נקודות:</span>
-                        <span id="pointsValue">150</span>
+                        <span>נקודות עוגן:</span>
+                        <span id="pointsValue">200</span>
                     </div>
-                    <input type="range" class="slider" id="points" min="50" max="500" value="150">
+                    <input type="range" class="slider" id="points" min="100" max="400" value="200">
                 </div>
                 <div class="slider-container">
                     <div class="slider-label">
                         <span>מספר קווים:</span>
-                        <span id="linesValue">2000</span>
+                        <span id="linesValue">3000</span>
                     </div>
-                    <input type="range" class="slider" id="lines" min="500" max="5000" value="2000">
+                    <input type="range" class="slider" id="lines" min="1000" max="6000" value="3000">
                 </div>
                 <div class="slider-container">
                     <div class="slider-label">
                         <span>עובי קו:</span>
-                        <span id="lineWidthValue">0.5</span>
+                        <span id="lineWidthValue">0.4</span>
                     </div>
-                    <input type="range" class="slider" id="lineWidth" min="0.1" max="2" step="0.1" value="0.5">
+                    <input type="range" class="slider" id="lineWidth" min="0.2" max="1.0" step="0.1" value="0.4">
                 </div>
             </div>
 
             <div class="control-group">
-                <h3>🎨 עיצוב ויזואלי</h3>
+                <h3>🎨 מראה ויזואלי</h3>
                 <div class="slider-container">
                     <div class="slider-label">
-                        <span>שקיפות קווים:</span>
-                        <span id="opacityValue">30</span>%
+                        <span>שקיפות:</span>
+                        <span id="opacityValue">25</span>%
                     </div>
-                    <input type="range" class="slider" id="opacity" min="5" max="100" value="30">
+                    <input type="range" class="slider" id="opacity" min="10" max="80" value="25">
                 </div>
                 <div class="slider-container">
                     <div class="slider-label">
-                        <span>ניגודיות:</span>
-                        <span id="contrastValue">120</span>%
+                        <span>חדות:</span>
+                        <span id="sharpnessValue">150</span>%
                     </div>
-                    <input type="range" class="slider" id="contrast" min="50" max="200" value="120">
-                </div>
-                <div class="slider-container">
-                    <div class="slider-label">
-                        <span>חדות קצוות:</span>
-                        <span id="edgeValue">80</span>%
-                    </div>
-                    <input type="range" class="slider" id="edge" min="0" max="100" value="80">
+                    <input type="range" class="slider" id="sharpness" min="100" max="250" value="150">
                 </div>
             </div>
 
             <div class="control-group">
-                <h3>🎭 פריסטים מוכנים</h3>
+                <h3>🎭 פריסטים</h3>
+                <button class="preset-btn" onclick="applyPreset('fine')">עדין</button>
+                <button class="preset-btn" onclick="applyPreset('bold')">נועז</button>
                 <button class="preset-btn" onclick="applyPreset('detailed')">מפורט</button>
-                <button class="preset-btn" onclick="applyPreset('minimal')">מינימלי</button>
+                <button class="preset-btn" onclick="applyPreset('minimal')">מינימל</button>
                 <button class="preset-btn" onclick="applyPreset('artistic')">אמנותי</button>
-                <button class="preset-btn" onclick="applyPreset('geometric')">גיאומטרי</button>
-                <button class="preset-btn" onclick="applyPreset('dense')">צפוף</button>
-                <button class="preset-btn" onclick="applyPreset('ethereal')">אתרי</button>
             </div>
 
             <div class="control-group">
-                <h3>🚀 ייצור</h3>
+                <h3>🚀 יצירה</h3>
                 <button class="generate-btn" id="generateBtn" onclick="generateStringArt()">
-                    צרו אמנות קווים
+                    יוצר String Art
                 </button>
             </div>
         </div>
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
-            <h3>יוצר אמנות קווים...</h3>
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
+            <h3 id="loadingTitle">יוצר String Art...</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
             </div>
-            <p id="progressText">מכין את הקנבס...</p>
+            <p id="progressText">מתחיל...</p>
         </div>
 
         <div class="results" id="results" style="display: none;">
             <div class="image-container">
                 <h3>תמונה מקורית</h3>
-                <div class="canvas-wrapper">
-                    <canvas id="originalCanvas" class="image-display"></canvas>
-                </div>
+                <canvas id="originalCanvas" class="canvas-display"></canvas>
             </div>
             <div class="image-container">
-                <h3>אמנות קווים</h3>
-                <div class="canvas-wrapper">
-                    <canvas id="stringCanvas" class="image-display"></canvas>
-                </div>
+                <h3>String Art</h3>
+                <canvas id="stringCanvas" class="canvas-display"></canvas>
                 <button class="download-btn" onclick="downloadArt()">💾 הורד יצירה</button>
-                <div class="stats" id="stats" style="display: none;">
+                <div class="stats">
                     <div class="stats-grid">
-                        <div class="stat-item">
+                        <div>
                             <div class="stat-value" id="totalPoints">0</div>
                             <div class="stat-label">נקודות</div>
                         </div>
-                        <div class="stat-item">
+                        <div>
                             <div class="stat-value" id="totalLines">0</div>
                             <div class="stat-label">קווים</div>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="totalLength">0</div>
-                            <div class="stat-label">מ"מ חוט</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="processingTime">0</div>
-                            <div class="stat-label">שניות</div>
+                        <div>
+                            <div class="stat-value" id="processingTime">0s</div>
+                            <div class="stat-label">זמן</div>
                         </div>
                     </div>
                 </div>
@@ -551,23 +414,21 @@
     </div>
 
     <script>
-        let originalImage = null;
         let originalCanvas, stringCanvas, originalCtx, stringCtx;
         let imageData = null;
         let isGenerating = false;
 
-        // Initialize event listeners
+        // Event listeners
         document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
         
         // Update slider values
-        const sliders = ['points', 'lines', 'lineWidth', 'opacity', 'contrast', 'edge'];
-        sliders.forEach(slider => {
-            const element = document.getElementById(slider);
-            element.addEventListener('input', () => {
-                document.getElementById(slider + 'Value').textContent = 
-                    slider === 'lineWidth' ? element.value : 
-                    slider === 'opacity' || slider === 'contrast' || slider === 'edge' ? element.value + (slider === 'contrast' ? '%' : '%') :
-                    element.value;
+        ['points', 'lines', 'lineWidth', 'opacity', 'sharpness'].forEach(id => {
+            const slider = document.getElementById(id);
+            slider.addEventListener('input', () => {
+                let value = slider.value;
+                if (id === 'opacity') value += '%';
+                if (id === 'sharpness') value += '%';
+                document.getElementById(id + 'Value').textContent = value;
             });
         });
 
@@ -575,12 +436,18 @@
             const file = event.target.files[0];
             if (!file) return;
 
+            console.log('Loading image:', file.name);
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     setupCanvases(img);
                     showControls();
+                    console.log('Image loaded successfully');
+                };
+                img.onerror = function() {
+                    showError('שגיאה בטעינת התמונה');
                 };
                 img.src = e.target.result;
             };
@@ -588,49 +455,49 @@
         }
 
         function setupCanvases(img) {
-            originalImage = img;
             originalCanvas = document.getElementById('originalCanvas');
             stringCanvas = document.getElementById('stringCanvas');
             originalCtx = originalCanvas.getContext('2d');
             stringCtx = stringCanvas.getContext('2d');
 
-            // Calculate dimensions
-            const maxSize = 400;
-            let { width, height } = img;
-            const ratio = Math.min(maxSize / width, maxSize / height);
-            width *= ratio;
-            height *= ratio;
+            // Calculate size
+            const maxSize = 500;
+            let width = img.width;
+            let height = img.height;
+            
+            if (width > maxSize || height > maxSize) {
+                const ratio = Math.min(maxSize / width, maxSize / height);
+                width = Math.round(width * ratio);
+                height = Math.round(height * ratio);
+            }
 
             // Set canvas sizes
-            [originalCanvas, stringCanvas].forEach(canvas => {
-                canvas.width = width;
-                canvas.height = height;
-            });
+            originalCanvas.width = width;
+            originalCanvas.height = height;
+            stringCanvas.width = width;
+            stringCanvas.height = height;
 
-            // Draw original image
+            // Draw original
             originalCtx.drawImage(img, 0, 0, width, height);
-            
-            // Get image data
             imageData = originalCtx.getImageData(0, 0, width, height);
-            
-            // Clear string canvas
+
+            // Prepare string canvas
             stringCtx.fillStyle = '#000000';
             stringCtx.fillRect(0, 0, width, height);
+
+            console.log('Canvas setup complete:', width, 'x', height);
         }
 
         function applyPreset(preset) {
             const presets = {
-                detailed: { points: 200, lines: 3000, lineWidth: 0.3, opacity: 25, contrast: 140, edge: 90 },
-                minimal: { points: 80, lines: 800, lineWidth: 0.8, opacity: 60, contrast: 100, edge: 40 },
-                artistic: { points: 150, lines: 2500, lineWidth: 0.4, opacity: 35, contrast: 130, edge: 75 },
-                geometric: { points: 120, lines: 1500, lineWidth: 0.6, opacity: 45, contrast: 110, edge: 60 },
-                dense: { points: 300, lines: 4000, lineWidth: 0.2, opacity: 20, contrast: 150, edge: 95 },
-                ethereal: { points: 100, lines: 1200, lineWidth: 0.5, opacity: 15, contrast: 90, edge: 30 }
+                fine: { points: 300, lines: 4000, lineWidth: 0.2, opacity: 20, sharpness: 200 },
+                bold: { points: 150, lines: 2000, lineWidth: 0.8, opacity: 40, sharpness: 120 },
+                detailed: { points: 250, lines: 5000, lineWidth: 0.3, opacity: 15, sharpness: 180 },
+                minimal: { points: 100, lines: 1500, lineWidth: 0.6, opacity: 35, sharpness: 100 },
+                artistic: { points: 200, lines: 3500, lineWidth: 0.4, opacity: 25, sharpness: 150 }
             };
 
             const config = presets[preset];
-            if (!config) return;
-
             Object.keys(config).forEach(key => {
                 const element = document.getElementById(key);
                 if (element) {
@@ -650,18 +517,18 @@
             document.getElementById('generateBtn').disabled = true;
 
             try {
-                // Get parameters
-                const numPoints = parseInt(document.getElementById('points').value);
-                const numLines = parseInt(document.getElementById('lines').value);
-                const lineWidth = parseFloat(document.getElementById('lineWidth').value);
-                const opacity = parseInt(document.getElementById('opacity').value) / 100;
-                const contrast = parseInt(document.getElementById('contrast').value) / 100;
-                const edgeThreshold = parseInt(document.getElementById('edge').value) / 100;
-
-                await createStringArt(numPoints, numLines, lineWidth, opacity, contrast, edgeThreshold, startTime);
+                const params = getParameters();
+                console.log('Starting generation with:', params);
+                
+                await createStringArt(params);
+                
+                const time = Math.round((Date.now() - startTime) / 1000);
+                showResults();
+                updateStats(params, time);
                 
             } catch (error) {
-                showError('שגיאה ביצירת האמנות: ' + error.message);
+                console.error('Generation error:', error);
+                showError('שגיאה ביצירה: ' + error.message);
             } finally {
                 isGenerating = false;
                 hideLoading();
@@ -669,117 +536,222 @@
             }
         }
 
-        async function createStringArt(numPoints, numLines, lineWidth, opacity, contrast, edgeThreshold, startTime) {
+        function getParameters() {
+            return {
+                points: parseInt(document.getElementById('points').value),
+                lines: parseInt(document.getElementById('lines').value),
+                lineWidth: parseFloat(document.getElementById('lineWidth').value),
+                opacity: parseInt(document.getElementById('opacity').value) / 100,
+                sharpness: parseInt(document.getElementById('sharpness').value) / 100
+            };
+        }
+
+        async function createStringArt(params) {
+            const { points: numPoints, lines: numLines, lineWidth, opacity, sharpness } = params;
             const width = stringCanvas.width;
             const height = stringCanvas.height;
             const centerX = width / 2;
             const centerY = height / 2;
-            const radius = Math.min(width, height) * 0.45;
+            const radius = Math.min(width, height) * 0.42;
 
-            // Clear canvas
-            stringCtx.fillStyle = '#000000';
-            stringCtx.fillRect(0, 0, width, height);
+            updateProgress(5, 'מכין נקודות עוגן...');
 
-            updateProgress(10, 'מחשב נקודות עוגן...');
-
-            // Generate anchor points in circle
-            const points = [];
+            // Create anchor points around circle
+            const anchorPoints = [];
             for (let i = 0; i < numPoints; i++) {
                 const angle = (i / numPoints) * 2 * Math.PI;
-                points.push({
+                anchorPoints.push({
                     x: centerX + radius * Math.cos(angle),
                     y: centerY + radius * Math.sin(angle),
-                    index: i
+                    id: i
                 });
             }
 
-            updateProgress(20, 'מכין מפת עוצמה...');
+            updateProgress(15, 'מעבד תמונה...');
 
-            // Process image data with enhanced contrast and edge detection
-            const processedData = new Uint8ClampedArray(imageData.data);
+            // Process image to grayscale with sharpening
+            const data = imageData.data;
+            const processedData = new Float32Array(width * height);
             
-            // Apply contrast
-            for (let i = 0; i < processedData.length; i += 4) {
-                const gray = 0.299 * processedData[i] + 0.587 * processedData[i + 1] + 0.114 * processedData[i + 2];
-                const enhancedGray = Math.pow(gray / 255, 1 / contrast) * 255;
-                processedData[i] = processedData[i + 1] = processedData[i + 2] = enhancedGray;
+            // Convert to grayscale
+            for (let i = 0; i < data.length; i += 4) {
+                const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                processedData[Math.floor(i / 4)] = gray;
             }
 
-            // Edge detection
-            const edgeData = detectEdges(processedData, width, height, edgeThreshold);
+            // Apply sharpening filter
+            const sharpenedData = new Float32Array(width * height);
+            for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                    const idx = y * width + x;
+                    const kernel = [
+                        -1, -1, -1,
+                        -1,  9, -1,
+                        -1, -1, -1
+                    ];
+                    
+                    let sum = 0;
+                    for (let ky = -1; ky <= 1; ky++) {
+                        for (let kx = -1; kx <= 1; kx++) {
+                            const pixelIdx = (y + ky) * width + (x + kx);
+                            const kernelIdx = (ky + 1) * 3 + (kx + 1);
+                            sum += processedData[pixelIdx] * kernel[kernelIdx] * (sharpness - 1);
+                        }
+                    }
+                    sharpenedData[idx] = Math.max(0, Math.min(255, processedData[idx] + sum));
+                }
+            }
 
-            updateProgress(30, 'מחשב מסלולי קווים אופטימליים...');
+            updateProgress(25, 'מתחיל ציור קווים...');
 
-            // String art algorithm
-            const lines = [];
-            let currentPoint = 0;
-            const usedConnections = new Set();
-
+            // Clear canvas and setup drawing
+            stringCtx.fillStyle = '#000000';
+            stringCtx.fillRect(0, 0, width, height);
             stringCtx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
             stringCtx.lineWidth = lineWidth;
             stringCtx.lineCap = 'round';
+            stringCtx.lineJoin = 'round';
 
-            for (let lineCount = 0; lineCount < numLines; lineCount++) {
-                if (lineCount % 100 === 0) {
-                    updateProgress(30 + (lineCount / numLines) * 60, `מצייר קו ${lineCount + 1} מתוך ${numLines}...`);
+            // String art algorithm - תחשיב מתקדם!
+            let currentPoint = 0;
+            const usedLines = new Set();
+            let linesDrawn = 0;
+
+            for (let step = 0; step < numLines && linesDrawn < numLines; step++) {
+                if (step % 300 === 0) {
+                    updateProgress(25 + (step / numLines) * 65, 
+                        `מצייר קו ${step + 1} / ${numLines}`);
                     await sleep(1);
                 }
 
-                let bestScore = -1;
-                let bestNextPoint = -1;
+                let bestScore = 0;
+                let bestTarget = -1;
 
-                // Find best next point
-                for (let i = 0; i < numPoints; i++) {
-                    if (i === currentPoint) continue;
+                // חפש את הנקודה הבאה הטובה ביותר
+                for (let target = 0; target < numPoints; target++) {
+                    if (target === currentPoint) continue;
                     
-                    const connectionKey = `${Math.min(currentPoint, i)}-${Math.max(currentPoint, i)}`;
-                    if (usedConnections.has(connectionKey)) continue;
+                    const lineKey = `${Math.min(currentPoint, target)}-${Math.max(currentPoint, target)}`;
+                    if (usedLines.has(lineKey)) continue;
 
-                    const score = calculateLineScore(points[currentPoint], points[i], edgeData, width, height);
+                    // חשב ציון עבור הקו הזה
+                    const score = calculateLineScore(
+                        anchorPoints[currentPoint], 
+                        anchorPoints[target], 
+                        sharpenedData, 
+                        width, 
+                        height
+                    );
+
                     if (score > bestScore) {
                         bestScore = score;
-                        bestNextPoint = i;
+                        bestTarget = target;
                     }
                 }
 
-                if (bestNextPoint === -1) {
-                    // Find any unused connection
-                    for (let i = 0; i < numPoints; i++) {
-                        if (i === currentPoint) continue;
-                        const connectionKey = `${Math.min(currentPoint, i)}-${Math.max(currentPoint, i)}`;
-                        if (!usedConnections.has(connectionKey)) {
-                            bestNextPoint = i;
-                            break;
-                        }
-                    }
-                }
+                // אם מצאנו קו טוב, צייר אותו
+                if (bestTarget !== -1 && bestScore > 50) {
+                    const lineKey = `${Math.min(currentPoint, bestTarget)}-${Math.max(currentPoint, bestTarget)}`;
+                    usedLines.add(lineKey);
 
-                if (bestNextPoint !== -1) {
-                    const connectionKey = `${Math.min(currentPoint, bestNextPoint)}-${Math.max(currentPoint, bestNextPoint)}`;
-                    usedConnections.add(connectionKey);
-
-                    // Draw line
+                    // צייר את הקו
                     stringCtx.beginPath();
-                    stringCtx.moveTo(points[currentPoint].x, points[currentPoint].y);
-                    stringCtx.lineTo(points[bestNextPoint].x, points[bestNextPoint].y);
+                    stringCtx.moveTo(anchorPoints[currentPoint].x, anchorPoints[currentPoint].y);
+                    stringCtx.lineTo(anchorPoints[bestTarget].x, anchorPoints[bestTarget].y);
                     stringCtx.stroke();
 
-                    lines.push([currentPoint, bestNextPoint]);
-                    currentPoint = bestNextPoint;
+                    currentPoint = bestTarget;
+                    linesDrawn++;
+                } else {
+                    // אם לא מצאנו קו טוב, קפוץ לנקודה אקראית
+                    currentPoint = Math.floor(Math.random() * numPoints);
                 }
             }
 
-            updateProgress(95, 'מסיים עיבוד...');
+            updateProgress(95, 'מוסיף נקודות עוגן...');
 
             // Draw anchor points
-            stringCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            points.forEach(point => {
+            stringCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            anchorPoints.forEach(point => {
                 stringCtx.beginPath();
-                stringCtx.arc(point.x, point.y, 1.5, 0, 2 * Math.PI);
+                stringCtx.arc(point.x, point.y, 2.5, 0, 2 * Math.PI);
                 stringCtx.fill();
             });
 
-            // Calculate statistics
-            const totalLength = lines.reduce((sum, line) => {
-                const p1 = points[line[0]];
-                const p2 = points[line[1]];
+            updateProgress(100, 'הושלם!');
+            await sleep(500);
+
+            console.log(`Generated ${linesDrawn} lines with ${numPoints} anchor points`);
+        }
+
+        function calculateLineScore(p1, p2, imageData, width, height) {
+            let totalDarkness = 0;
+            let samples = 0;
+            const steps = 30;
+
+            for (let i = 0; i <= steps; i++) {
+                const t = i / steps;
+                const x = Math.round(p1.x + t * (p2.x - p1.x));
+                const y = Math.round(p1.y + t * (p2.y - p1.y));
+
+                if (x >= 0 && x < width && y >= 0 && y < height) {
+                    const pixelIndex = y * width + x;
+                    const darkness = 255 - imageData[pixelIndex];
+                    totalDarkness += darkness;
+                    samples++;
+                }
+            }
+
+            return samples > 0 ? totalDarkness / samples : 0;
+        }
+
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showControls() {
+            document.getElementById('controls').style.display = 'grid';
+        }
+
+        function showResults() {
+            document.getElementById('results').style.display = 'grid';
+        }
+
+        function updateStats(params, time) {
+            document.getElementById('totalPoints').textContent = params.points;
+            document.getElementById('totalLines').textContent = params.lines;
+            document.getElementById('processingTime').textContent = time + 's';
+        }
+
+        function downloadArt() {
+            const link = document.createElement('a');
+            link.download = `string-art-${Date.now()}.png`;
+            link.href = stringCanvas.toDataURL('image/png', 1.0);
+            link.click();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 5000);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        console.log('String Art Generator v2.0 loaded');
+    </script>
+</body>
+</html>
